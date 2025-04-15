@@ -1,6 +1,3 @@
-// wind_tunnel_sfml.cpp
-// Wind tunnel simulation ported from Python to C++ using SFML and Armadillo
-
 #include <SFML/Graphics.hpp>
 #include <armadillo>
 #include <vector>
@@ -21,13 +18,14 @@ float turbulence = 4.0f;         // vorticity confinement coefficient
 float viscosity = 0.2f;         // diffusion coefficient
 bool showPressure = false;        // toggle between velocity and pressure visualization
 bool eraseMode = false;           // toggle for source erase
+float max_strength = 1000.0f;
 
 // Visualization colors
 typedef sf::Color Color;
-const Color minColor(31, 24, 38);
-const Color maxColor(209, 155, 255);
-const Color minPressColor(20, 20, 26);
-const Color maxPressColor(175, 230, 255);
+const Color minColor(68, 2, 86);
+const Color maxColor(65, 189, 113);
+const Color minPressColor(38, 30, 255);
+const Color maxPressColor(255, 25, 29);
 const float colorGamma = 0.5f;
 
 // Fields (N+2 for ghost cells)
@@ -211,8 +209,8 @@ void render(sf::RenderWindow &window) {
         window.setTitle("Pressure Mode: Max = " + std::to_string(maxP) +
                         ", Min = " + std::to_string(minP));
     } else {
-        window.setTitle("Velocity Mode: Max = " + std::to_string(maxSpeed) +
-                        ", Min = " + std::to_string(minSpeed));
+        window.setTitle("V: Max = " + std::to_string(maxSpeed) +
+                        ", Min = " + std::to_string(minSpeed) + ", S: " + std::to_string(strength));
     }
     
     
@@ -276,14 +274,14 @@ int main() {
                     case sf::Keyboard::E: eraseMode = !eraseMode; break;
                     case sf::Keyboard::Q: dt = std::max(0.01f, dt - 0.01f); break;
                     case sf::Keyboard::W: dt = std::min(1.0f, dt + 0.01f); break;
-                    case sf::Keyboard::A: damping = std::max(0.0f, damping - 0.01f); break;
-                    case sf::Keyboard::S: damping = std::min(1.0f, damping + 0.01f); break;
-                    case sf::Keyboard::Z: strength = std::max(0.0f, strength - 1.0f); break;
-                    case sf::Keyboard::X: strength = std::min(100.0f, strength + 1.0f); break;
+                    case sf::Keyboard::F: damping = std::max(0.0f, damping - 0.01f); break;
+                    case sf::Keyboard::D: damping = std::min(1.0f, damping + 0.01f); break;
+                    case sf::Keyboard::A: strength = std::max(0.0f, strength - 1.0f); break;
+                    case sf::Keyboard::S: strength = std::min(max_strength, strength + 1.0f); break;
                     case sf::Keyboard::R: turbulence = std::max(0.0f, turbulence - 0.5f); break;
                     case sf::Keyboard::T: turbulence = std::min(50.0f, turbulence + 0.5f); break;
-                    case sf::Keyboard::F: viscosity = std::max(0.0f, viscosity - 0.01f); break;
-                    case sf::Keyboard::G: viscosity = std::min(1.0f, viscosity + 0.01f); break;
+                    case sf::Keyboard::B: viscosity = std::max(0.0f, viscosity - 0.01f); break;
+                    case sf::Keyboard::V: viscosity = std::min(1.0f, viscosity + 0.01f); break;
                     default: break;
                 }
             }
